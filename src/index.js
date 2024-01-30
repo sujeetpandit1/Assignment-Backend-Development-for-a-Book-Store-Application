@@ -12,9 +12,9 @@ app.use(express.json());
 db();
 
 // Load routes
-// app.use('/auth', require('./routes/authRoutes'));
-// app.use('/books', require('./routes/bookRoutes'));
-// app.use('/purchases', require('./routes/purchaseRoutes'));
+app.use('/auth', require('./routes/authRoutes'));
+app.use('/books', require('./routes/bookRoutes'));  
+app.use('/purchases', require('./routes/purchaseRoutes'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
