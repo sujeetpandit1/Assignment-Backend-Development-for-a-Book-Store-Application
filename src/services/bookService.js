@@ -1,54 +1,56 @@
+const sendErrorResponse = require('../errorHandler/apiError');
 const Book = require('../models/bookModel');
+const joi = require('joi');
 
-// Function to retrieve all books
-const getAllBooks = async () => {
-  try {
-    // Find all books in the database
-    const books = await Book.find();
-    return books;
-  } catch (error) {
-    throw error;
-  }
-};
+// Book validation
+const bookSchema = joi.object({
+    bookId: joi.string().min(4).max(18).required(),
+    title: joi.string().min(4).max(60).required(),
+    description: joi.string().required(),
+    price: joi.number().min(100).max(1000).required(),
+})
 
-// Function to retrieve a book by ID
-const getBookById = async (bookId) => {
-  try {
-    // Find the book by ID in the database
-    const book = await Book.findById(bookId);
-    return book;
-  } catch (error) {
-    throw error;
-  }
-};
+const validateBook = (req, res, next) =>{
+    const {error} = bookSchema.validate(req.body);
 
-// Function to add a new book
-const addBook = async (bookDetails) => {
-  try {
-    // Create a new book instance with the provided details
-    const newBook = new Book(bookDetails);
-
-    // Save the new book to the database
-    await newBook.save();
-
-    return newBook;
-  } catch (error) {
-    // Handle duplicate title error separately
-    if (error.code === 11000) {
-      throw { code: 'DUPLICATE_TITLE', message: 'Book with the same title already exists' };
+    if(error){
+        return sendErrorResponse(res, 400, error.details[0].message);
     }
 
-    // Handle other errors
-    throw error;
-  }
+    next()
+} 
+
+const addBook = async (bookData) => {
+  const newBook = new Book(bookData);
+  await newBook.save();
+  return newBook;
 };
 
-// Other book service functions can be added as needed
+const updateBook = async (bookId, updatedData) => {
+  const updatedBook = await Book.findOneAndUpdate(
+    { bookId },
+    updatedData,
+    { new: true, runValidators: true }
+  );
+  return updatedBook;
+};
 
-// Export the service functions
+const deleteBook = async (bookId) => {
+  const deletedBook = await Book.findOneAndDelete({ bookId });
+  return deletedBook;
+};
+
+const getBooks = async (page, limit) => {
+  const books = await Book.find()
+    .skip((page - 1) * limit)
+    .limit(limit);
+  return books;
+};
+
 module.exports = {
-  getAllBooks,
-  getBookById,
+  validateBook,
   addBook,
-  // Add other functions here
+  updateBook,
+  deleteBook,
+  getBooks
 };
