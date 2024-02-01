@@ -1,17 +1,15 @@
+// routes/bookRoutes.js
 const express = require('express');
+const { addBook } = require('../controllers/bookController');
+const  {auth, authorizeAuthor}  = require('../auth/authMiddleware');
+const { validateBook } = require('../services/bookService');
+
 const router = express.Router();
-const bookController = require('../controllers/bookController');
 
-// Route to get all books
-router.get('/books', bookController.getAllBooks);
+router.post('/addBook', auth, authorizeAuthor, validateBook, addBook);
+// router.put('/books/:bookId', bookController.updateBook);
+// router.delete('/books/:bookId', bookController.deleteBook);
+// router.get('/books', bookController.getBooks);
 
-// Route to get a book by ID
-router.get('/books/:bookId', bookController.getBookById);
-
-// Route to add a new book
-router.post('/books', bookController.addBook);
-
-// Other book routes can be added as needed
-
-// Export the router
 module.exports = router;
+ 

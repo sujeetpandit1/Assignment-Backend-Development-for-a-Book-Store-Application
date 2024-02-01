@@ -7,6 +7,8 @@ const purchaseSchema = new mongoose.Schema({
   purchaseDate: { type: Date, default: Date.now },
   price: { type: Number, required: true },
   quantity: { type: Number, default: 1 },
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('Purchase', purchaseSchema);
