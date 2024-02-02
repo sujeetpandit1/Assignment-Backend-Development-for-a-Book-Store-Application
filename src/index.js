@@ -32,6 +32,7 @@ app.use('/user', require('./routes/userRoutes'));
 app.use('/books', require('./routes/bookRoutes'));  
 app.use('/purchase', require('./routes/purchaseRoutes'));
 app.use('/revenue', require('./routes/revenueRoutes'));
+app.use('/review', require('./routes/reviewRoutes'));
 
 app.all("/**", (_req, res) => {
     res
