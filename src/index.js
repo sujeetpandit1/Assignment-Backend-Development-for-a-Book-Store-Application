@@ -30,7 +30,8 @@ app.use((err, req, res, next) => {
 // Load routes
 app.use('/user', require('./routes/userRoutes'));
 app.use('/books', require('./routes/bookRoutes'));  
-app.use('/purchases', require('./routes/purchaseRoutes'));
+app.use('/purchase', require('./routes/purchaseRoutes'));
+app.use('/revenue', require('./routes/revenueRoutes'));
 
 app.all("/**", (_req, res) => {
     res
