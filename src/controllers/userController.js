@@ -8,14 +8,14 @@ const sendErrorResponse = require('../errorHandler/apiError');
 
 
 const registerUser = tryCatch(async (req, res) => {
-  const { username, password, role, fullName } = req.body;
+  const { username, password, role, fullName, email } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = new User({ username, password: hashedPassword, role, fullName });
+  const newUser = new User({ username, password: hashedPassword, role, fullName , email});
   await newUser.save();
 
-  return res.status(201).json(new ApiResponse(undefined, 'User Registered Successfully', ""));
+  return res.status(201).json(new ApiResponse(undefined, 'User Registered Successfully'));
 });
 
 
@@ -33,7 +33,7 @@ const loginUser = tryCatch (async (req, res) => {
   }
   const secretKey = process.env.JWT_SECRET_KEY;
 
-  const token = jwt.sign({ userId: user._id, username: user.username, role: user.role , fullName: user.fullName}, secretKey, { expiresIn: '4h' });
+  const token = jwt.sign({ userId: user._id, username: user.username, role: user.role , fullName: user.fullName}, secretKey, { expiresIn: '48h' });
   return res.status(200).send({status: "success", message: "Login Sucessfull", token: token}); 
 });
 

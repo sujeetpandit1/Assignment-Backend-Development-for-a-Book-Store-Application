@@ -6,7 +6,8 @@ const userSchema = joi.object({
     username: joi.string().length(6).regex(/^[a-z]+$/).required(),
     password: joi.string().min(8).max(16).required(),
     role: joi.string().valid('admin', 'author', 'retail').required(),
-    fullName: joi.string().max(60).required()
+    fullName: joi.string().max(60).required(),
+    email: joi.string().email().required()
 })
 
 const validateUser = (req, res, next) =>{
