@@ -39,6 +39,18 @@ const updateReview = tryCatch (async (req, res) =>{
     return res.status(200).json(new ApiResponse(undefined, 'Review Updated Successfully', updatedreview));
 })
 
+const getReview = tryCatch (async (req, res)=>{
+        const bookId = req.query.bookId;
+        if(!bookId){
+            return sendErrorResponse(res, 400, "Please Check Book Id")
+        }
+        const getBookReview = await Review.find({bookId: { $regex: new RegExp(bookId, 'i') }});
+        if(!getBookReview){
+          return sendErrorResponse(res, 404, "Review Not Found For this Book")
+        }
+        return res.status(200).json(new ApiResponse(undefined, "Review fetched successfully", getBookReview));
+})
+
 const deleteReview = tryCatch (async (req, res) => {
 
     const id = req.params.id;
@@ -53,5 +65,5 @@ const deleteReview = tryCatch (async (req, res) => {
 });
 
 
-module.exports = {createReview, updateReview, deleteReview}
+module.exports = {createReview, updateReview, deleteReview, getReview}
   

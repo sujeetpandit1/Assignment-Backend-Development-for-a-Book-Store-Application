@@ -8,6 +8,7 @@ const Purchase = require('../models/purchaseModel');
 const generateUniquePurchaseId = require('../utils/purchaseUtils');
 const mongoose = require('mongoose');
 const { startSession } = require('mongoose');
+const { sendEmail } = require('../config/mailer');
 
 // const { generateUniquePurchaseId } = require('../utils/generateSlug');
 
@@ -128,6 +129,7 @@ const getPurchaseHistory = tryCatch (async (req, res) => {
 const purchaseBook = tryCatch(async (req, res) => {
   const { bookId, quantity } = req.body;
   const userId = req.user.userId;
+  const userName = req.user.fullName;
 
    // Calculate revenue for the author
    const book = await Book.findOne({ bookId });
@@ -180,10 +182,23 @@ const purchaseBook = tryCatch(async (req, res) => {
       userId,
       price: totalPrice,
       quantity,
-    });
+    })
 
     // Save the new purchase to the database
     await newPurchase.save({ session });
+
+    const currentDateTime = new Date().toLocaleString();
+    // Send notification to the user
+    const user = await User.findById(userId);
+    const emailContent = `Thank you for your purchase!\nYou have successfully bought ${quantity}, copies of :- \nBook Title = ${book.title}\nTotal amount paid: ${totalPrice}/- \nPurchase Date and Time: ${currentDateTime}`;
+
+    await sendEmail(user.email, 'Purchase Successful', emailContent);
+
+    // Send notification to the author
+    const author = await User.findById(book.userId);
+    const authorEmailContent = `Your book ${book.title} has been purchased by ${userName}, \nQuantity = ${quantity}, \nRevenue earned: ${authorRevenue}/- \nPurchase Date and Time: ${currentDateTime}`;
+
+    await sendEmail(author.email, 'Book Sale Notification', authorEmailContent);
 
     // Commit the transaction
     await session.commitTransaction();
