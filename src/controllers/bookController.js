@@ -1,4 +1,3 @@
-const { sendEmail } = require('../config/mailer');
 const sendErrorResponse = require('../errorHandler/apiError');
 const ApiResponse = require('../errorHandler/apiResponse');
 const tryCatch = require('../errorHandler/tryCatch');
@@ -7,7 +6,8 @@ const User = require('../models/userModel');
 const bookService = require('../services/bookService');
 const { startSession } = require('mongoose');
 const {generateSlug, generateSlugWithPrefix} = require('../utils/generateSlug');
-// const slugify = require('slugify');
+const { startEmailSendingController } = require('../queueServices/queues');
+
 
 
 const addBook = async (req, res) => {
@@ -33,34 +33,13 @@ const addBook = async (req, res) => {
       quantity,
     });
 
-    // Save the new book within the transaction
     await newBook.save({ session });
-
-    // Send notification to users with role "retail"
-    const retailUsers = await User.find({ role: 'retail' });
-    const emailContent = `A new book "${title}" has been added by ${authorName}. Check it out now!`;
-
-    // Split users into batches of 100
-    const batchSize = 100;
-    const batches = [];
-    for (let i = 0; i < retailUsers.length; i += batchSize) {
-      batches.push(retailUsers.slice(i, i + batchSize));
-    }
-
-    // Send emails in batches
-    for (const batch of batches) {
-      await Promise.all(
-        batch.map(async (user) => {
-          await sendEmail(user.email, 'New Book Added', emailContent);
-        })
-      );
-      // Introduce a delay or any other logic between batches if needed
-    }
-
-    // Commit the transaction
     await session.commitTransaction();
 
-    return res.status(201).json(new ApiResponse(undefined, 'Book added Successfully', newBook));
+    startEmailSendingController(req, res)
+
+    res.status(201).json(new ApiResponse(undefined, 'Book added Successfully', newBook));
+    
   } catch (error) {
     if(error.code === 11000){
       const field = Object.keys(error.keyValue)[0];
@@ -68,12 +47,10 @@ const addBook = async (req, res) => {
           status: 'failed',
           message: `${field.charAt(0).toUpperCase() + field.slice(1)} '${error.keyValue[field]}' already exists.`,
       }); }
-    // Roll back the transaction in case of an error
     await session.abortTransaction();
     console.error(error);
     return sendErrorResponse(res, 400, 'Transaction Aborted: Unable to add the book');
   } finally {
-    // End the session
     session.endSession();
   }
 };
@@ -94,7 +71,7 @@ const deleteBook = tryCatch (async (req, res) => {
     if(!deletedBook){
       return sendErrorResponse(res, 404, "Book Not Found")
     }
-    return res.status(204).send();
+    return res.status(204).send(); 
 });
 
 const getBooks =  tryCatch (async (req, res) => {

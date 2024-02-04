@@ -2,6 +2,7 @@ const express = require('express');
 const { addBook, updateBook, deleteBook, getBooks, searchBook } = require('../controllers/bookController');
 const  {auth, authorizeAuthor}  = require('../auth/authMiddleware');
 const { validateBook, validateToUpdateBook } = require('../services/bookService');
+const { startEmailSendingController } = require('../queueServices/queues');
 
 const router = express.Router();
 
