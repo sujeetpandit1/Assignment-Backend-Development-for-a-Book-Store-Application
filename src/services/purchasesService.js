@@ -1,6 +1,11 @@
 const Purchase = require('../models/purchaseModel');
 const sendErrorResponse = require('../errorHandler/apiError');
 const joi = require('joi');
+const Book = require('../models/bookModel');
+const User = require('../models/userModel');
+const { sendEmail } = require('../config/mailer');
+
+
 
 
 // Purchase validation
@@ -25,9 +30,50 @@ const getPurchaseHistory = async (userId) => {
     return history;
 };
 
+function calculateAuthorRevenue(price, quantity) {
+    return price * quantity * 0.9;
+};
+
+async function updateBookAndUser(book, authorRevenue, quantity, session) {
+    const [updatedBook, updatedUser] = await Promise.all([
+      Book.findOneAndUpdate(
+        { _id: book._id, version: book.version },
+        {
+          $set: {
+            sellCount: book.sellCount + quantity,
+            quantity: book.quantity - quantity,
+            revenue: book.revenue + authorRevenue
+          },
+          $inc: { version: 1 },
+        },
+        { new: true, session }
+      ),
+      User.findByIdAndUpdate(book.userId, { $inc: { revenue: authorRevenue } }, { new: true, session })
+    ]);
+  
+    return [updatedBook, updatedUser];
+};
+
+async function sendPurchaseNotificationEmails(newPurchase, book, userName) {
+    const currentDateTime = new Date().toLocaleString();
+  
+    const user = await User.findById(newPurchase.userId);
+    const emailContent = `Thank you for your purchase!\nYou have successfully bought ${newPurchase.quantity} copies of:\nBook Title = ${book.title}\nTotal amount paid: ${newPurchase.price}/-\nPurchase Date and Time: ${currentDateTime}`;
+  
+    await sendEmail(user.email, 'Purchase Successful', emailContent);
+  
+    const author = await User.findById(book.userId);
+    const authorEmailContent = `Your book ${book.title} has been purchased by ${userName},\nQuantity = ${newPurchase.quantity},\nRevenue earned: ${book.price * newPurchase.quantity * 0.9}/-\nPurchase Date and Time: ${currentDateTime}`;
+  
+    await sendEmail(author.email, 'Book Sale Notification', authorEmailContent);
+  }
+
+
   
 module.exports = {
   validatePurchase,
-  getPurchaseHistory
-
+  getPurchaseHistory,
+  calculateAuthorRevenue,
+  updateBookAndUser,
+  sendPurchaseNotificationEmails
 };

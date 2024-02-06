@@ -1,0 +1,31 @@
+<!-- public/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stripe Payment Demo</title>
+</head>
+<body>
+  <h1>Stripe Payment Demo</h1>
+
+  <form id="payment-form">
+    <div>
+      <label for="card-element">Credit or debit card</label>
+      <div id="card-element">
+        <!-- A Stripe Element will be inserted here. -->
+      </div>
+    </div>
+
+    <!-- Used to display form errors. -->
+    <div id="card-errors" role="alert"></div>
+
+    <button type="button" id="submit-button">Pay</button>
+  </form>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
