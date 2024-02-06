@@ -98,7 +98,7 @@ const searchBook = tryCatch (async (req, res) =>{
 
     const filter = {};
     if (title) filter.title = new RegExp(title, 'i');
-    if (author) filter.authors = new RegExp(author, 'i');;
+    if (author) filter.authors = new RegExp(author, 'i');
     if (minPrice !== undefined) filter.price = { $gte: parseInt(minPrice) };
     if (maxPrice !== undefined) filter.price = { ...filter.price, $lte: parseInt(maxPrice) };
 

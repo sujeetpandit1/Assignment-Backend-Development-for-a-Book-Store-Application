@@ -15,6 +15,8 @@ const purchaseSchema = new Schema({
   },
   price: { type: Number, required: true },
   quantity: { type: Number, default: 1 },
+  paymentId: { type: String, required: true },
+  status: { type: String, default: 'pending' }
 }, {
   timestamps: true,
 });

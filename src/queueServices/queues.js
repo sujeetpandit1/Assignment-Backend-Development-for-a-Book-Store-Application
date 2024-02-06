@@ -91,7 +91,6 @@ const startEmailSending = async (req, res) => {
 
 const startEmailSendingController = tryCatch(async (req, res) => {
   startEmailSending(req, res);
-//   res.status(200).json({ message: 'Email sending process started successfully.' });
   console.log('Email sending process started successfully.' );
 });
 

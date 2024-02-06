@@ -25,7 +25,6 @@ const revenueDetails = tryCatch (async (req, res) =>{
     // Send revenue details email
     // await sendRevenueDetailsEmail(authorId, totalRevenue, monthlyRevenue, yearlyRevenue);
 
-    // res.status(200).json({ message: 'Revenue details email sent successfully' });
     return res.status(200).json(new ApiResponse(undefined, "Revenue Details Retrived Successfully", {monthlyRevenue, yearlyRevenue, totalRevenue}))
 })
 
