@@ -22,6 +22,10 @@ const purchaseBook = tryCatch(async (req, res) => {
   const userId = req.user.userId;
   const userName = req.user.fullName;
 
+  if (!userId || !userName) {
+    return sendErrorResponse(res, 400, `Invalid Token`);
+  }
+
   const book = await Book.findOne({ bookId });
   if (!book) {
     return sendErrorResponse(res, 404, "Book Not Available");
