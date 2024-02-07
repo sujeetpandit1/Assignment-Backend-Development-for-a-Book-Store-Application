@@ -33,7 +33,7 @@ const loginUser = tryCatch (async (req, res) => {
   }
   const secretKey = process.env.JWT_SECRET_KEY;
 
-  const token = jwt.sign({ userId: user._id, username: user.username, role: user.role , fullName: user.fullName}, secretKey, { expiresIn: '48h' });
+  const token = jwt.sign({ userId: user._id, username: user.username, role: user.role , fullName: user.fullName, email: user.email}, secretKey, { expiresIn: '48h' });
   return res.status(200).send({status: "success", message: "Login Sucessfull", token: token}); 
 });
 

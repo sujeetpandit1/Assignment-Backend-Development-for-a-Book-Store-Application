@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.STRIPE_PUBLIC_KEY);
+const stripe = require('stripe')(process.env.STRIP_SECRET_KEY);
 
 
 const processPayment = async (book, quantity) => {
@@ -17,7 +17,7 @@ const processPayment = async (book, quantity) => {
         data,
         {
           payment_method: 'pm_card_visa',
-          return_url: 'http://localhost:6000',
+          return_url: 'http://localhost:6000', 
         }
       );
 

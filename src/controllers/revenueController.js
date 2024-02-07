@@ -1,3 +1,5 @@
+const { sendRevenueDetailsEmail } = require("../config/mailer");
+const sendErrorResponse = require("../errorHandler/apiError");
 const ApiResponse = require("../errorHandler/apiResponse");
 const tryCatch = require("../errorHandler/tryCatch");
 const Book = require('../models/bookModel')
@@ -5,6 +7,12 @@ const Book = require('../models/bookModel')
 
 const revenueDetails = tryCatch (async (req, res) =>{
     const userId = req.user.userId;
+    const authorEmail = req.user.email;
+    const authorname = req.user.fullName;
+
+    if (!userId || !authorEmail || !authorname) {
+      return sendErrorResponse(res, 400, `Invalid Token`);
+    }
 
     const books = await Book.find({ userId: userId });
 
@@ -21,7 +29,7 @@ const revenueDetails = tryCatch (async (req, res) =>{
       .reduce((total, book) => total + book.revenue, 0);
 
     // Send revenue details email
-    await sendRevenueDetailsEmail(authorId, totalRevenue, monthlyRevenue, yearlyRevenue);
+    sendRevenueDetailsEmail(authorEmail, authorname, totalRevenue, monthlyRevenue, yearlyRevenue);
 
     return res.status(200).json(new ApiResponse(undefined, "Revenue Details Retrived Successfully", {monthlyRevenue, yearlyRevenue, totalRevenue}))
 })

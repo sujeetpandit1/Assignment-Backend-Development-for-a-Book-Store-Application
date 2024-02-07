@@ -43,6 +43,29 @@ const sendBulkEmail = async (recipients, subject, text) => {
   }
 };
 
+const sendRevenueDetailsEmail = async (authorEmail, authorname, totalRevenue, monthlyRevenue, yearlyRevenue) => {
+  try {
+    const to = authorEmail; // Replace with the actual recipient email address
+    const subject = 'Revenue Details';
+    const text = `
+    Dear ${authorname},
+
+    Your book store has generated the following revenue details:
+    
+    Monthly Revenue: ${monthlyRevenue}
+    Yearly Revenue: ${yearlyRevenue}
+    Total Revenue: ${totalRevenue}
 
 
-module.exports = { sendEmail, sendBulkEmail };
+    Thanks,
+    `;
+
+    await sendEmail(to, subject, text);
+  } catch (error) {
+    console.error('Error sending revenue details email: ', error);
+  }
+};
+
+
+
+module.exports = { sendEmail, sendBulkEmail, sendRevenueDetailsEmail };
