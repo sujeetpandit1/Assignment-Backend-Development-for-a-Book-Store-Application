@@ -85,7 +85,7 @@ const getBooks =  tryCatch (async (req, res) => {
     }
 
     const modifiedBooks = books.map(book => {
-      const { sellCount, __v,_id, createdAt, updatedAt, ...bookWithoutSellCount } = book._doc;
+      const { sellCount, __v,_id, version, revenue, createdAt, updatedAt, ...bookWithoutSellCount } = book._doc;
       return bookWithoutSellCount;
     });
 
